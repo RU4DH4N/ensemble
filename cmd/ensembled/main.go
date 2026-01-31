@@ -1,7 +1,7 @@
 package main
 
 import (
-	"awesomeProject/tui"
+	"ensemble/internal/tui"
 	"fmt"
 	"os"
 
