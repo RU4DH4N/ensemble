@@ -82,7 +82,7 @@ func (t *Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			msg = UpMsg{}
 		case "down", "j":
 			msg = DownMsg{}
-		case "enter":
+		case "enter", "u":
 			msg = EnterMsg{}
 		case "c":
 			msg = cancelMsg{}
@@ -122,7 +122,7 @@ func (t *Tui) View() string {
 	}
 
 	if s, ok := t.screens[screen]; ok {
-		return screen + " :test: " + s.View()
+		return s.View()
 	}
 	return "Error: Screen model missing."
 }
@@ -134,7 +134,7 @@ func CreateTui() *Tui {
 	return &Tui{
 		screens: map[string]tea.Model{
 			"main_menu":        CreateMainMenu(),
-			"Load New Project": CreateFileUploader(),
+			"Load New Project": CreateProjectLoader(),
 		},
 		stack: st,
 		root:  "main_menu",

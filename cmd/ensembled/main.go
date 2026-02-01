@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	p := tea.NewProgram(tui.CreateTui())
+	p := tea.NewProgram(tui.CreateTui(), tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("an error!: %v", err)
 		os.Exit(1)
