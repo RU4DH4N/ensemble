@@ -19,6 +19,10 @@ var (
 		Foreground(lipgloss.Color("240")).
 		PaddingLeft(2).
 		Italic(true)
+
+	pickerContainerStyle = lipgloss.NewStyle().
+		Border(lipgloss.NormalBorder(), true, false, false, false).
+		BorderForeground(lipgloss.Color("62"))
 )
 
 type ProjectLoader struct {
@@ -43,7 +47,6 @@ func (p *ProjectLoader) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		p.windowHeight = msgType.Height
 		p.windowWidth = msgType.Width
-		p.filepicker.SetHeight(p.calculatePickerHeight())
 	}
 
 	var cmd tea.Cmd
@@ -59,7 +62,7 @@ func (p *ProjectLoader) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (p *ProjectLoader) View() string {
-	p.filepicker.SetHeight(p.calculatePickerHeight()) // fix this at some point
+	p.filepicker.SetHeight(p.calculatePickerHeight())
 
 	var s strings.Builder
 
@@ -74,10 +77,8 @@ func (p *ProjectLoader) View() string {
 	}
 
 	s.WriteString("\n")
-	s.WriteString(lipgloss.NewStyle().
-		Border(lipgloss.NormalBorder(), true, false, false, false).
-		BorderForeground(lipgloss.Color("62")).
-		Render("Select a File:\n" + p.filepicker.View()))
+	pickerContent := "Select a File:\n" + p.filepicker.View()
+	s.WriteString(pickerContainerStyle.Render(pickerContent))
 
 	return s.String()
 }
@@ -85,7 +86,7 @@ func (p *ProjectLoader) View() string {
 func (p *ProjectLoader) calculatePickerHeight() int {
 	projectLines := len(p.loadedProjects)
 	if projectLines == 0 {
-		projectLines = 1 // "No projects loaded" message
+		projectLines = 1
 	}
 
 	usedLines := 7 + projectLines
