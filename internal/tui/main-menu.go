@@ -69,6 +69,6 @@ func (m MainMenu) View() string {
 
 func CreateMainMenu() MainMenu {
 	return MainMenu{
-		choices: []string{"Current Projects Overview", "Load New Project", "Settings", "Exit"},
+		choices: []string{"Current Projects Overview", "Load New Project", "Settings"},
 	}
 }
