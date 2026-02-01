@@ -12,19 +12,13 @@ import (
 
 var (
 	itemStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#04B575")).
-			PaddingLeft(2)
+		Foreground(lipgloss.Color("#04B575")).
+		PaddingLeft(2)
 
 	emptyStateStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("240")).
-			PaddingLeft(2).
-			Italic(true)
-
-	pickerContainerStyle = lipgloss.NewStyle().
-				MarginTop(1).
-				PaddingTop(1).
-				Border(lipgloss.NormalBorder(), true, false, false, false). // Top border only
-				BorderForeground(lipgloss.Color("62"))
+		Foreground(lipgloss.Color("240")).
+		PaddingLeft(2).
+		Italic(true)
 )
 
 type ProjectLoader struct {
@@ -58,7 +52,6 @@ func (p *ProjectLoader) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if didSelect, path := p.filepicker.DidSelectFile(msg); didSelect {
 		if loaded := util.StartProject(path); loaded {
 			p.loadedProjects = append(p.loadedProjects, path)
-			p.filepicker.SetHeight(p.calculatePickerHeight())
 		}
 	}
 
@@ -66,6 +59,8 @@ func (p *ProjectLoader) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (p *ProjectLoader) View() string {
+	p.filepicker.SetHeight(p.calculatePickerHeight()) // fix this at some point
+
 	var s strings.Builder
 
 	s.WriteString(titleStyle.Render("Loaded Projects") + "\n")
@@ -79,14 +74,21 @@ func (p *ProjectLoader) View() string {
 	}
 
 	s.WriteString("\n")
-	s.WriteString(lipgloss.NewStyle().Bold(true).Render("Select a File:") + "\n")
-	s.WriteString(p.filepicker.View())
+	s.WriteString(lipgloss.NewStyle().
+		Border(lipgloss.NormalBorder(), true, false, false, false).
+		BorderForeground(lipgloss.Color("62")).
+		Render("Select a File:\n" + p.filepicker.View()))
 
 	return s.String()
 }
 
 func (p *ProjectLoader) calculatePickerHeight() int {
-	usedLines := 5 + len(p.loadedProjects)
+	projectLines := len(p.loadedProjects)
+	if projectLines == 0 {
+		projectLines = 1 // "No projects loaded" message
+	}
+
+	usedLines := 7 + projectLines
 	return max(p.windowHeight-usedLines, 5)
 }
 
@@ -94,7 +96,6 @@ func CreateProjectLoader() *ProjectLoader {
 	fp := filepicker.New()
 	fp.AllowedTypes = []string{".json"}
 	fp.ShowHidden = true
-	fp.SetHeight(10)
 
 	if dir, ok := os.LookupEnv("UPLOAD_DIR"); ok {
 		fp.CurrentDirectory = dir
